@@ -1,18 +1,17 @@
-import React from 'react'
 import PropTypes from 'prop-types'
-
-import LayoutDefault from './Layout'
+import React from 'react'
 import InputDefault from './Input'
+import LayoutDefault from './Layout'
 import PreviewDefault from './Preview'
 import SubmitButtonDefault from './SubmitButton'
 import {
+  accepts,
+  defaultClassNames,
   formatBytes,
   formatDuration,
-  accepts,
-  resolveValue,
-  mergeStyles,
-  defaultClassNames,
   getFilesFromEvent as defaultGetFilesFromEvent,
+  mergeStyles,
+  resolveValue,
 } from './utils'
 
 export type StatusValue =
@@ -314,7 +313,7 @@ class Dropzone extends React.Component<IDropzoneProps, { active: boolean; dragge
 
   handleChangeStatus = (fileWithMeta: IFileWithMeta) => {
     if (!this.props.onChangeStatus) return
-    const { meta = {} } = this.props.onChangeStatus(fileWithMeta, fileWithMeta.meta.status, this.files) || {}
+    const { meta = null } = this.props.onChangeStatus(fileWithMeta, fileWithMeta.meta.status, this.files) || {}
     if (meta) {
       delete meta.status
       fileWithMeta.meta = { ...fileWithMeta.meta, ...meta }
