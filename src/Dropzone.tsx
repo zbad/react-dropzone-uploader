@@ -1,11 +1,18 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import InputDefault from './Input';
-import LayoutDefault from './Layout';
-import PreviewDefault from './Preview';
-import SubmitButtonDefault from './SubmitButton';
-import { accepts, defaultClassNames, formatBytes, formatDuration, getFilesFromEvent as defaultGetFilesFromEvent, mergeStyles, resolveValue } from './utils';
-
+import PropTypes from 'prop-types'
+import React from 'react'
+import InputDefault from './Input'
+import LayoutDefault from './Layout'
+import PreviewDefault from './Preview'
+import SubmitButtonDefault from './SubmitButton'
+import {
+  accepts,
+  defaultClassNames,
+  formatBytes,
+  formatDuration,
+  getFilesFromEvent as defaultGetFilesFromEvent,
+  mergeStyles,
+  resolveValue,
+} from './utils'
 
 export type StatusValue =
   | 'rejected_file_type'
