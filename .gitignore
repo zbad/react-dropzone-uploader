@@ -28,3 +28,4 @@ src/Input.js
 src/Layout.js
 src/Preview.js
 src/SubmitButton.js
+.vscode/settings.json
