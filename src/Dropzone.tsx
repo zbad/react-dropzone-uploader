@@ -257,6 +257,11 @@ class Dropzone extends React.Component<IDropzoneProps, { active: boolean; dragge
     if (this.props.initialFiles) this.handleFiles(this.props.initialFiles)
   }
 
+  componentDidUpdate(prevProps: IDropzoneProps) {
+    const { initialFiles } = this.props
+    if (prevProps.initialFiles !== initialFiles && initialFiles) this.handleFiles(initialFiles)
+  }
+
   componentWillUnmount() {
     this.mounted = false
     for (const fileWithMeta of this.files) this.handleCancel(fileWithMeta)
@@ -446,10 +451,15 @@ class Dropzone extends React.Component<IDropzoneProps, { active: boolean; dragge
     const objectUrl = URL.createObjectURL(file)
 
     const fileCallbackToPromise = (fileObj: HTMLImageElement | HTMLAudioElement) => {
-      return new Promise(resolve => {
-        if (fileObj instanceof HTMLImageElement) fileObj.onload = resolve
-        else fileObj.onloadedmetadata = resolve
-      })
+      return Promise.race([
+        new Promise(resolve => {
+          if (fileObj instanceof HTMLImageElement) fileObj.onload = resolve
+          else fileObj.onloadedmetadata = resolve
+        }),
+        new Promise((_, reject) => {
+          setTimeout(reject, 1000)
+        }),
+      ])
     }
 
     try {
