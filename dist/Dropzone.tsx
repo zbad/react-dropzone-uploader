@@ -257,6 +257,11 @@ class Dropzone extends React.Component<IDropzoneProps, { active: boolean; dragge
     if (this.props.initialFiles) this.handleFiles(this.props.initialFiles)
   }
 
+  componentDidUpdate(prevProps: IDropzoneProps) {
+    const { initialFiles } = this.props
+    if (prevProps.initialFiles !== initialFiles && initialFiles) this.handleFiles(initialFiles)
+  }
+
   componentWillUnmount() {
     this.mounted = false
     for (const fileWithMeta of this.files) this.handleCancel(fileWithMeta)
@@ -362,7 +367,8 @@ class Dropzone extends React.Component<IDropzoneProps, { active: boolean; dragge
   handleFiles = (files: File[]) => {
     files.forEach((f, i) => this.handleFile(f, `${new Date().getTime()}-${i}`))
     const { current } = this.dropzone
-    if (current) setTimeout(() => current.scroll({ top: current.scrollHeight, behavior: 'smooth' }), 150)
+    if (current && typeof current.scroll === 'function')
+      setTimeout(() => current.scroll({ top: current.scrollHeight, behavior: 'smooth' }), 150)
   }
 
   handleFile = async (file: File, id: string) => {
@@ -445,10 +451,15 @@ class Dropzone extends React.Component<IDropzoneProps, { active: boolean; dragge
     const objectUrl = URL.createObjectURL(file)
 
     const fileCallbackToPromise = (fileObj: HTMLImageElement | HTMLAudioElement) => {
-      return new Promise(resolve => {
-        if (fileObj instanceof HTMLImageElement) fileObj.onload = resolve
-        else fileObj.onloadedmetadata = resolve
-      })
+      return Promise.race([
+        new Promise(resolve => {
+          if (fileObj instanceof HTMLImageElement) fileObj.onload = resolve
+          else fileObj.onloadedmetadata = resolve
+        }),
+        new Promise((_, reject) => {
+          setTimeout(reject, 1000)
+        }),
+      ])
     }
 
     try {
@@ -536,7 +547,7 @@ class Dropzone extends React.Component<IDropzoneProps, { active: boolean; dragge
         this.forceUpdate()
       }
 
-      if (xhr.status >= 400 && fileWithMeta.meta.status !== 'error_upload') {
+      if (xhr.readyState === 4 && xhr.status >= 400 && fileWithMeta.meta.status !== 'error_upload') {
         fileWithMeta.meta.status = 'error_upload'
         this.handleChangeStatus(fileWithMeta)
         this.forceUpdate()
